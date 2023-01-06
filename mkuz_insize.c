@@ -25,9 +25,8 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
 
-#include <sys/disk.h>
+#include <sys/statfs.h>
 #include <sys/ioctl.h>
 #include <sys/param.h>
 #include <sys/mount.h>
@@ -42,15 +41,16 @@ __FBSDID("$FreeBSD$");
 off_t
 mkuz_get_insize(struct mkuz_cfg *cfp)
 {
-	int ffd;
+	//int ffd;
 	off_t ms;
 	struct stat sb;
-	struct statfs statfsbuf;
+	//struct statfs statfsbuf;
 
 	if (fstat(cfp->fdr, &sb) != 0) {
 		warn("fstat(%s)", cfp->iname);
 		return (-1);
 	}
+	/*
 	if ((sb.st_flags & SF_SNAPSHOT) != 0) {
 		if (fstatfs(cfp->fdr, &statfsbuf) != 0) {
 			warn("fstatfs(%s)", cfp->iname);
@@ -71,6 +71,13 @@ mkuz_get_insize(struct mkuz_cfg *cfp)
 	} else if (S_ISCHR(sb.st_mode)) {
 		if (ioctl(cfp->fdr, DIOCGMEDIASIZE, &ms) < 0) {
 			warn("ioctl(DIOCGMEDIASIZE)");
+			return (-1);
+		}
+		sb.st_size = ms;
+	*/
+	if (S_ISCHR(sb.st_mode)) {
+		if (ioctl(cfp->fdr, BLKGETSIZE64, &ms) < 0) {
+			warn("ioctl(BLKGETSIZE64)");
 			return (-1);
 		}
 		sb.st_size = ms;

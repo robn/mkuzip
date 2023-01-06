@@ -1,14 +1,15 @@
-# $FreeBSD$
+PROG = mkuzip
 
-PROG=	mkuzip
-MAN=	mkuzip.8
-SRCS=	mkuzip.c mkuz_blockcache.c mkuz_lzma.c mkuz_zlib.c mkuz_conveyor.c \
-	mkuz_blk.c mkuz_fqueue.c mkuz_time.c mkuz_insize.c mkuz_zstd.c
+OBJS = mkuzip.o mkuz_blockcache.o mkuz_lzma.o mkuz_zlib.o mkuz_conveyor.o \
+       mkuz_blk.o mkuz_fqueue.o mkuz_time.o mkuz_insize.o mkuz_zstd.o
 
-CFLAGS+=	-I${SRCTOP}/sys/contrib/zstd/lib
+CFLAGS = -Wall -Werror -O2
+LDFLAGS = -lbsd -lpthread -lz -llzma -lzstd
 
-#CFLAGS+=	-DMKUZ_DEBUG
+all: $(PROG)
 
-LIBADD=	lzma md pthread z zstd
+$(PROG): $(OBJS)
+	$(CC) -o $(PROG) $(OBJS) $(LDFLAGS)
 
-.include <bsd.prog.mk>
+clean:
+	rm -f $(PROG) $(OBJS)
